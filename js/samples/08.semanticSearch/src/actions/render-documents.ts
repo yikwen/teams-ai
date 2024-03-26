@@ -31,6 +31,7 @@ export function renderDocuments() {
         for (const document of params.documents) {
             const item = (await client.getDriveItem(document.siteId, document.id)).data;
             const thumbnails = (await client.getDriveItemThumbnails(document.siteId, document.id)).data;
+            const thumbnail = thumbnails.value[0].small || thumbnails.value[0].medium || thumbnails.value[0].large
 
             attachments.push(CardFactory.adaptiveCard({
                 $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
@@ -46,9 +47,9 @@ export function renderDocuments() {
                                 items: [
                                     {
                                         type: 'Image',
-                                        url: thumbnails.value[0].small.url,
-                                        height: `${thumbnails.value[0].small.height}px`,
-                                        width: `${thumbnails.value[0].small.width}px`
+                                        url: thumbnail.url,
+                                        height: `${thumbnail.height}px`,
+                                        width: `${thumbnail.width}px`
                                     }
                                 ]
                             },
