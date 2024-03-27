@@ -5,10 +5,13 @@ import { PromptCompletionModel, PromptResponse } from '../models';
 import { Memory } from '../MemoryFork';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
 import { Tokenizer } from '../tokenizers';
+import { Colorize } from '../internals/Colorize';
+import colorizeJson from 'json-colorizer';
 
 export interface LlamaModelOptions {
     apiKey: string;
     endpoint: string;
+    logRequests: boolean;
 }
 
 export class LlamaModel implements PromptCompletionModel {
@@ -44,18 +47,31 @@ export class LlamaModel implements PromptCompletionModel {
         }
 
         let last: Message | undefined = result.output[result.output.length - 1];
+        console.log(Colorize.warning(`Hello ${JSON.stringify(result.output[result.output.length - 1])}`));
         if (last?.role !== 'user') {
             last = undefined;
         }
         let res;
 
+        if (this.options.logRequests) {
+            console.log(Colorize.title('CHAT PROMPT:'));
+            console.log(Colorize.output(result.output));
+        }
+
+        console.log(`parameters: ${colorizeJson(JSON.stringify(template.config.completion))}`);
         try {
-            res = await this._httpClient.post<{ output: string }>(this.options.endpoint, {
+            res = await this._httpClient.post(this.options.endpoint, {
                 input_data: {
                     input_string: result.output,
                     parameters: template.config.completion
                 }
             });
+            if (this.options.logRequests) {
+                console.log(Colorize.title('CHAT RESPONSE:'));
+                console.log(Colorize.value('status', res.status));
+                console.log(Colorize.output(res.data[0]));
+                console.log(Colorize.title(`~~~~~~~~~`));
+            }
         } catch (err) {
             console.error(err);
             throw err;
@@ -66,7 +82,7 @@ export class LlamaModel implements PromptCompletionModel {
             input: last,
             message: {
                 role: 'assistant',
-                content: res!.data.output
+                content: res!.data[0]
             }
         };
     }

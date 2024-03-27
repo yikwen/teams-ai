@@ -3,11 +3,14 @@
     "description": "A bot that can turn the lights on and off",
     "type": "completion",
     "completion": {
-        "model": "llama-2-7b-chat-18",
-        "temperature": 0.2,
+        "model": "mistralai-Mistral-7B-Instruct-v01",
+        "temperature": 0.0,
         "top_p": 0.9,
-        "do_sample": true,
-        "max_new_tokens": 500
+        "do_sample": false,
+        "response_format": {
+            "type": "json_object"
+        },
+        "return_full_text": false
     },
     "augmentation": {
         "augmentation_type": "sequence"
