@@ -18,11 +18,11 @@
             {
                 "type": "azure_search",
                 "parameters": {
-                    "endpoint": "AZURE SEARCH ENDPOINT",
+                    "endpoint": "AZURE_SEARCH_ENDPOINT",
                     "index_name": "contoso",
                     "authentication": {
-                        "type": "AZURE SEARCH API KEY",
-                        "key": ""
+                        "type": "api_key",
+                        "key": "AZURE_SEARCH_KEY"
                     }
                 }
             }

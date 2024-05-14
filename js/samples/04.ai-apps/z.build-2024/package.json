@@ -1,5 +1,5 @@
 {
-    "name": "teams-azureopenai-demo",
+    "name": "teams-azureopenai-build-demo",
     "version": "1.0.0",
     "description": "Sample bot demonstrating using Azure AI Search for RAG.",
     "author": "Microsoft",
