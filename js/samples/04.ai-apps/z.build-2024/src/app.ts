@@ -56,7 +56,7 @@ const planner = new ActionPlanner({
             type: 'azure_search',
             parameters: {
                 endpoint: process.env.AZURE_SEARCH_ENDPOINT,
-                index_name: process.env.AZURE_SEARCH_INDEX || 'contoso',
+                index_name: process.env.AZURE_SEARCH_INDEX || 'healthplan',
                 authentication: {
                     type: 'api_key',
                     key: process.env.AZURE_SEARCH_KEY
