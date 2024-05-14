@@ -1,6 +1,5 @@
-import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter } from '@microsoft/teams-ai';
+import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter, AI, Message } from '@microsoft/teams-ai';
 import {
-    ActivityTypes,
     CardFactory,
     ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
@@ -17,6 +16,8 @@ error.log = console.log.bind(console);
 interface ConversationState {}
 type ApplicationTurnState = TurnState<ConversationState>;
 
+const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-35-turbo-16k';
+
 if (
     !process.env.AZURE_OPENAI_KEY ||
     !process.env.AZURE_OPENAI_ENDPOINT ||
@@ -32,7 +33,7 @@ if (
 const model = new OpenAIModel({
     // Azure OpenAI Support
     azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    azureDefaultDeployment: 'gpt-35-turbo',
+    azureDefaultDeployment: deployment,
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2024-02-15-preview',
 
@@ -47,13 +48,31 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'chat'
+    defaultPrompt: async () => {
+        const template = await prompts.getPrompt('chat');
+
+        template.config.completion.model = deployment;
+        (template.config.completion as any).data_sources = [{
+            type: 'azure_search',
+            parameters: {
+                endpoint: process.env.AZURE_SEARCH_ENDPOINT,
+                index_name: process.env.AZURE_SEARCH_INDEX || 'contoso',
+                authentication: {
+                    type: 'api_key',
+                    key: process.env.AZURE_SEARCH_KEY
+                }
+            }
+        }];
+
+        return template;
+    }
 });
 
 // Define storage and application
 const storage = new MemoryStorage();
 export const app = new Application<ApplicationTurnState>({
     storage: storage,
+    ai: { planner },
     adapter: new TeamsAdapter(
         {},
         new ConfigurationServiceClientCredentialFactory({
@@ -84,9 +103,9 @@ app.error(async (context: TurnContext, err: any) => {
     await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 });
 
-app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
-    const response = await planner.completePrompt(context, state, 'chat');
-    const attachment = CardFactory.adaptiveCard(createResponseCard(response));
+app.ai.action(AI.SayCommandActionName, async (context: TurnContext, state: ApplicationTurnState, data: { response: Message<string> }) => {
+    const attachment = CardFactory.adaptiveCard(createResponseCard(data.response));
     const activity = MessageFactory.attachment(attachment);
     await context.sendActivity(activity);
+    return '';
 });

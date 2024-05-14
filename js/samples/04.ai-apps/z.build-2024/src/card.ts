@@ -1,13 +1,13 @@
-import { AdaptiveCard, PromptResponse } from '@microsoft/teams-ai';
+import { AdaptiveCard, Message } from '@microsoft/teams-ai';
 
 /**
  * Create an adaptive card from a prompt response.
  * @param {PromptResponse<string>} response The prompt response to create the card from.
  * @returns {AdaptiveCard} The response card.
  */
-export function createResponseCard(response: PromptResponse<string>): AdaptiveCard {
+export function createResponseCard(message: Message<string>): AdaptiveCard {
     const citationCards: any = [];
-    response.message!.context!.citations.forEach((citation, i) => {
+    message.context!.citations.forEach((citation, i) => {
         citationCards.push({
             type: 'Action.ShowCard',
             title: `${i + 1}`,
@@ -30,7 +30,7 @@ export function createResponseCard(response: PromptResponse<string>): AdaptiveCa
         });
     });
 
-    const text = formatResponse(response.message!.content!);
+    const text = formatResponse(message.content!);
     const card: AdaptiveCard = {
         type: 'AdaptiveCard',
         body: [
