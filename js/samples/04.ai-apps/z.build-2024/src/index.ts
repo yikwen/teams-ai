@@ -6,11 +6,12 @@ import { config } from 'dotenv';
 import * as path from 'path';
 import debug from 'debug';
 import * as restify from 'restify';
-import { app } from './app';
 import { TeamsAdapter } from '@microsoft/teams-ai';
 
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
+
+import { app } from './app';
 
 const log = debug('azureopenai:server');
 log.log = console.log.bind(console);
