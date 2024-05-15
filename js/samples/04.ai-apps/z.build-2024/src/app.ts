@@ -1,4 +1,13 @@
-import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter, AI, Message } from '@microsoft/teams-ai';
+import {
+    OpenAIModel,
+    PromptManager,
+    ActionPlanner,
+    Application,
+    TurnState,
+    TeamsAdapter,
+    AI,
+    Message
+} from '@microsoft/teams-ai';
 import {
     CardFactory,
     ConfigurationServiceClientCredentialFactory,
@@ -52,17 +61,19 @@ const planner = new ActionPlanner({
         const template = await prompts.getPrompt('chat');
 
         template.config.completion.model = deployment;
-        (template.config.completion as any).data_sources = [{
-            type: 'azure_search',
-            parameters: {
-                endpoint: process.env.AZURE_SEARCH_ENDPOINT,
-                index_name: process.env.AZURE_SEARCH_INDEX || 'healthplan',
-                authentication: {
-                    type: 'api_key',
-                    key: process.env.AZURE_SEARCH_KEY
+        (template.config.completion as any).data_sources = [
+            {
+                type: 'azure_search',
+                parameters: {
+                    endpoint: process.env.AZURE_SEARCH_ENDPOINT,
+                    index_name: process.env.AZURE_SEARCH_INDEX || 'healthplan',
+                    authentication: {
+                        type: 'api_key',
+                        key: process.env.AZURE_SEARCH_KEY
+                    }
                 }
             }
-        }];
+        ];
 
         return template;
     }
@@ -103,9 +114,12 @@ app.error(async (context: TurnContext, err: any) => {
     await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 });
 
-app.ai.action(AI.SayCommandActionName, async (context: TurnContext, state: ApplicationTurnState, data: { response: Message<string> }) => {
-    const attachment = CardFactory.adaptiveCard(createResponseCard(data.response));
-    const activity = MessageFactory.attachment(attachment);
-    await context.sendActivity(activity);
-    return '';
-});
+app.ai.action(
+    AI.SayCommandActionName,
+    async (context: TurnContext, state: ApplicationTurnState, data: { response: Message<string> }) => {
+        const attachment = CardFactory.adaptiveCard(createResponseCard(data.response));
+        const activity = MessageFactory.attachment(attachment);
+        await context.sendActivity(activity);
+        return '';
+    }
+);
