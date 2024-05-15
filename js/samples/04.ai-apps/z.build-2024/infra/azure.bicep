@@ -7,10 +7,6 @@ param resourceBaseName string
 param botAadAppClientId string
 
 @secure()
-@description('Required by Bot Framework package in your bot project')
-param botAadAppClientSecret string
-
-@secure()
 param azureOpenAIKey string = ''
 
 @secure()
@@ -21,6 +17,10 @@ param azureSearchKey string = ''
 
 @secure()
 param azureSearchEndpoint string = ''
+
+@secure()
+@description('Required by Bot Framework package in your bot project')
+param botAadAppClientSecret string
 
 param webAppSKU string
 
