@@ -62,7 +62,7 @@
                 "hidden": true
             },
             "internalConsoleOptions": "neverOpen"
-        },
+        }
     ],
     "compounds": [
         {
@@ -74,18 +74,6 @@
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
                 "group": "all",
-                "order": 1
-            },
-            "stopAll": true
-        },
-        {
-            "name": "Debug in Test Tool (Preview)",
-            "configurations": [
-                "Attach to Local Service"
-            ],
-            "preLaunchTask": "Start Teams App (Test Tool)",
-            "presentation": {
-                "group": "2-local",
                 "order": 1
             },
             "stopAll": true
